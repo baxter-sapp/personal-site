@@ -46,19 +46,36 @@ git push origin main
 
 If your default branch is `master`, replace `main` with `master`.
 
-### B) Enable GitHub Pages
+### B) Enable Pages (recommended: GitHub Actions)
 
 1. Open your repository on GitHub.
 2. Go to **Settings** -> **Pages**.
-3. Under **Build and deployment**:
+3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+4. Commit/push will trigger the included workflow at `.github/workflows/pages.yml`.
+5. Go to the **Actions** tab and wait for `Deploy static site to Pages` to complete.
+
+This repository now includes a ready-to-use Pages workflow:
+- `.github/workflows/pages.yml`
+
+### C) If you prefer branch deploy (only if available)
+
+Some repos still show this option:
 - Source: **Deploy from a branch**
 - Branch: **main** (or `master`)
 - Folder: **/ (root)**
-4. Save.
+
+If you do not see **Deploy from a branch**, that is expected for some repo/account/org setups. Use **GitHub Actions**.
+
+### D) Common blockers
 
 Your site URL will typically be one of these:
 - `https://<your-username>.github.io/<repo-name>/`
 - `https://<your-username>.github.io/` (if the repo name is `<your-username>.github.io`)
+
+If deployment still does not work, check:
+- Repo visibility/plan limits for private repos.
+- Org policy restricting Pages.
+- **Settings** -> **Actions** -> **General** -> Workflow permissions set to allow workflow writes.
 
 ## 3. Update your content
 
