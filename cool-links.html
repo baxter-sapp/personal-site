@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Baxter Sapp | Cool Links</title>
+  <meta name="description" content="A collection of links Baxter Sapp likes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Newsreader:opsz,wght@6..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260226">
+  <style>
+    .cool-links-grid {
+      margin-top: 1.2rem;
+      display: grid;
+      gap: 1.2rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .link-card {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      min-height: 165px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbf9f4 100%);
+      border: 2px solid #d8cfbe;
+      border-radius: 18px;
+      padding: 1.05rem 1.05rem 0.9rem;
+      box-shadow: 0 12px 24px rgba(31, 36, 40, 0.11);
+      overflow: hidden;
+    }
+
+    .link-card h2 {
+      margin: 0;
+      width: 100%;
+      font-size: clamp(1.02rem, 1.45vw, 1.22rem);
+      line-height: 1.25;
+      color: #1f2f32;
+    }
+
+    .link-card-link {
+      text-decoration: none;
+      color: var(--ink);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .link-card-link:hover,
+    .link-card-link:focus-visible {
+      transform: translateY(-4px);
+      border-color: #c4b496;
+      box-shadow: 0 16px 28px rgba(31, 36, 40, 0.15);
+    }
+
+    .link-card-hover {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 0.95rem;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1.35;
+      background: linear-gradient(180deg, rgba(13, 20, 26, 0.12) 0%, rgba(13, 20, 26, 0.95) 70%);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.16s ease, transform 0.16s ease;
+      pointer-events: none;
+    }
+
+    .link-card:hover .link-card-hover,
+    .link-card:focus-within .link-card-hover {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .link-card.placeholder {
+      border-style: dashed;
+      border-color: #d7cdb8;
+      background: linear-gradient(180deg, #fefdf9 0%, #f8f4ea 100%);
+    }
+
+    @media (max-width: 900px) {
+      .cool-links-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .cool-links-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">Baxter Sapp</a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="blog.html">Blog</a>
+        <a href="cool-links.html">Cool Links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <h1>Cool Links</h1>
+      <p class="lead">Stuff I like and use often. More links coming soon.</p>
+
+      <section class="cool-links-grid" aria-label="Cool links list">
+        <a class="link-card link-card-link" href="https://scryfall.com/search?q=game%3Apaper&unique=cards&as=grid&order=random" target="_blank" rel="noopener noreferrer">
+          <h2>Scryfall Random Search</h2>
+          <p class="link-card-hover">Jump into a random-order card search and discover something weird, busted, or beautiful.</p>
+        </a>
+
+        <a class="link-card link-card-link" href="https://convoke.gg/" target="_blank" rel="noopener noreferrer">
+          <h2>convoke.magic</h2>
+          <p class="link-card-hover">Play Magic online with webcam-friendly pods and a fast setup flow.</p>
+        </a>
+
+        <article class="link-card placeholder">
+          <h2>Placeholder Link 01</h2>
+          <p class="link-card-hover">Add your next favorite tool, article, deck tech, or project here.</p>
+        </article>
+
+        <article class="link-card placeholder">
+          <h2>Placeholder Link 02</h2>
+          <p class="link-card-hover">Another spot for resources you want to keep close and easy to revisit.</p>
+        </article>
+
+        <article class="link-card placeholder">
+          <h2>Placeholder Link 03</h2>
+          <p class="link-card-hover">Drop in anything: writing, videos, creators, or your own experiments.</p>
+        </article>
+
+        <article class="link-card placeholder">
+          <h2>Placeholder Link 04</h2>
+          <p class="link-card-hover">One more card so this section stays balanced at six total tiles.</p>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <p>&copy; <span id="year"></span> Baxter Sapp</p>
+      <p><a href="mailto:baxtersapp@gmail.com">baxtersapp@gmail.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

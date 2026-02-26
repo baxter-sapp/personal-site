@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Baxter Sapp | Data Engineer</title>
+  <title>Baxter Sapp</title>
   <meta name="description" content="Baxter Sapp - Data Engineer building scalable data and AI systems.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +19,7 @@
         <a href="#experience">Experience</a>
         <a href="#skills">Skills</a>
         <a href="blog.html">Blog</a>
+        <a href="cool-links.html">Cool Links</a>
       </nav>
     </div>
   </header>
@@ -188,6 +189,38 @@
         <a class="btn btn-primary" href="blog.html">Go to Blog</a>
       </div>
     </section>
+
+    <section class="section">
+      <div class="container mtg-grid">
+        <section class="random-card" aria-live="polite">
+          <div class="random-card-head">
+            <p class="random-card-label">Random MTG Card</p>
+            <button id="new-card-btn" class="btn btn-secondary random-card-btn" type="button">Draw Another</button>
+          </div>
+          <p id="card-status" class="muted card-status">Loading a random card...</p>
+          <a id="card-link" class="card-preview" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open card on Scryfall">
+            <img id="card-image" alt="Random Magic card artwork" loading="lazy">
+            <div class="card-hover" id="card-hover-text">Oracle text appears here.</div>
+          </a>
+          <p class="muted card-meta" id="card-meta"></p>
+        </section>
+        <aside class="mtg-note">
+          <h2>Why MTG Rules</h2>
+          <p>
+            Magic: The Gathering is one of my favorite games because it rewards creativity, strategy, and constant learning.
+            Every deck tells a different story, and every match feels like solving a new puzzle. 
+          </p>
+          <p>
+            If you're interested in my favorite card, it's a tie between Krenko, Mob Boss and Squee, 
+            Goblin Nabob. I've always been a fan of red aggro decks, and these two cards perfectly 
+            capture the chaotic fun of goblin tribal strategies.
+          </p>
+          <p>
+            If you want to shuffle up and play, feel free to shoot me an email. We can play on Convoke or SpellTable.
+          </p>
+        </aside>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -199,6 +232,87 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    const cardStatus = document.getElementById('card-status');
+    const cardImage = document.getElementById('card-image');
+    const cardHoverText = document.getElementById('card-hover-text');
+    const cardMeta = document.getElementById('card-meta');
+    const cardLink = document.getElementById('card-link');
+    const drawButton = document.getElementById('new-card-btn');
+
+    function getCardImageUrl(card) {
+      if (card.image_uris && card.image_uris.normal) {
+        return card.image_uris.normal;
+      }
+      if (Array.isArray(card.card_faces)) {
+        const faceWithImage = card.card_faces.find((face) => face.image_uris && face.image_uris.normal);
+        if (faceWithImage) {
+          return faceWithImage.image_uris.normal;
+        }
+      }
+      return '';
+    }
+
+    function getOracleText(card) {
+      if (card.oracle_text) {
+        return card.oracle_text;
+      }
+      if (Array.isArray(card.card_faces)) {
+        return card.card_faces
+          .map((face) => {
+            const name = face.name || 'Face';
+            const text = face.oracle_text || 'No oracle text.';
+            return name + ': ' + text;
+          })
+          .join('\n\n');
+      }
+      return 'No oracle text available for this card.';
+    }
+
+    async function loadRandomCard() {
+      cardStatus.textContent = 'Loading a random card...';
+      drawButton.disabled = true;
+      drawButton.textContent = 'Drawing...';
+
+      try {
+        const response = await fetch('https://api.scryfall.com/cards/random');
+        if (!response.ok) {
+          throw new Error('Scryfall request failed');
+        }
+
+        const card = await response.json();
+        const imageUrl = getCardImageUrl(card);
+        const oracleText = getOracleText(card);
+        const cardName = card.name || 'Unknown Card';
+        const typeLine = card.type_line || '';
+        const setName = card.set_name || '';
+        const setCode = card.set ? card.set.toUpperCase() : '';
+        const cardUrl = card.scryfall_uri || 'https://scryfall.com';
+
+        if (!imageUrl) {
+          throw new Error('No card image found');
+        }
+
+        cardImage.src = imageUrl;
+        cardImage.alt = cardName + ' card image';
+        cardHoverText.textContent = oracleText;
+        cardMeta.textContent = typeLine + (setName ? ' | ' + setName + (setCode ? ' (' + setCode + ')' : '') : '');
+        cardLink.href = cardUrl;
+        cardStatus.textContent = cardName;
+      } catch (error) {
+        cardStatus.textContent = 'Could not load a card right now. Please try again.';
+        cardHoverText.textContent = 'Oracle text unavailable.';
+        cardMeta.textContent = '';
+        cardImage.removeAttribute('src');
+        cardLink.href = '#';
+      } finally {
+        drawButton.disabled = false;
+        drawButton.textContent = 'Draw Another';
+      }
+    }
+
+    drawButton.addEventListener('click', loadRandomCard);
+    loadRandomCard();
   </script>
 </body>
 </html>

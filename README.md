@@ -1,10 +1,11 @@
 # Personal Website for GitHub Pages
 
 This project is a static personal website built from:
-- `index.html` (main portfolio page)
-- `blog.html` (blog landing page)
-- `styles.css` (shared styles)
-- `assets/profile-primary.jpeg` and `assets/profile-secondary.jpeg` (portrait photos framed with CSS crop/focus)
+- `index.html` (main portfolio/home page)
+- `blog.html` (blog page)
+- `cool-links.html` (links page with card layout)
+- `styles.css` (shared site styles)
+- `assets/profile-primary.jpeg` and `assets/profile-secondary.jpeg` (portrait photos)
 
 ## 1. Run locally
 
@@ -19,6 +20,7 @@ Then open:
 
 - [http://localhost:8000](http://localhost:8000)
 - Blog page: [http://localhost:8000/blog.html](http://localhost:8000/blog.html)
+- Cool Links page: [http://localhost:8000/cool-links.html](http://localhost:8000/cool-links.html)
 
 To stop the server, press `Ctrl + C`.
 
@@ -79,10 +81,26 @@ If deployment still does not work, check:
 
 ## 3. Update your content
 
-- Edit biography/experience text in `index.html`.
-- Add blog posts by duplicating a `<article class="blog-post">...</article>` block in `blog.html`.
-- Replace photos in `assets/` if needed (keep similar file names or update HTML paths).
+- Home page content:
+  - Edit biography, experience, and skills in `index.html`.
+  - Update nav links in the `<header>` blocks if you add/remove pages.
+  - MTG random card widget lives near the bottom of `index.html` and uses Scryfall API (`https://api.scryfall.com/cards/random`).
+- Blog page content:
+  - Add posts by duplicating a `<article class="blog-post">...</article>` block in `blog.html`.
+- Cool Links page content:
+  - Edit cards in `cool-links.html`.
+  - Current structure is 6 cards total, shown 3 per row on desktop.
+  - Filled cards are linkable `<a class="link-card link-card-link">...</a>`.
+  - Placeholder cards are non-link `<article class="link-card placeholder">...</article>`.
+- Styling:
+  - Shared styles are in `styles.css`.
+  - `cool-links.html` also includes a small inline `<style>` block for card-specific styling/cache reliability.
 
-## 4. Notes on resume content
+## 4. Quick edit examples
 
-I pulled as much content as possible from your provided resume PDF in this environment. If you want exact line-for-line wording from the resume, I can do a final copy pass after you confirm the text sections.
+- Add a new cool link card:
+  1. Copy one existing linked card block in `cool-links.html`.
+  2. Update card title (`<h2>`), URL (`href`), and hover text (`<p class="link-card-hover">`).
+- Change the number of columns:
+  - In `styles.css`, update `.cool-links-grid { grid-template-columns: ... }`.
+  - Mobile breakpoints are near the bottom of `styles.css` (`900px` and `620px`).
