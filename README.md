@@ -2,9 +2,11 @@
 
 This project is a static personal website built from:
 - `index.html` (main portfolio/home page)
-- `blog.html` (blog page)
+- `blog.html` (blog page renderer)
 - `cool-links.html` (links page with card layout)
 - `styles.css` (shared site styles)
+- `blogs/index.json` (blog manifest file)
+- `blogs/*.md` (individual blog articles in Markdown)
 - `assets/profile-primary.jpeg` and `assets/profile-secondary.jpeg` (portrait photos)
 
 ## 1. Run locally
@@ -86,7 +88,9 @@ If deployment still does not work, check:
   - Update nav links in the `<header>` blocks if you add/remove pages.
   - MTG random card widget lives near the bottom of `index.html` and uses Scryfall API (`https://api.scryfall.com/cards/random`).
 - Blog page content:
-  - Add posts by duplicating a `<article class="blog-post">...</article>` block in `blog.html`.
+  - Blog content is loaded from markdown files in `blogs/`.
+  - `blog.html` fetches `blogs/index.json`, then fetches each markdown file listed there.
+  - Keep filenames date-first for consistency (example: `2026-03-03-my-post.md`).
 - Cool Links page content:
   - Edit cards in `cool-links.html`.
   - Current structure is 6 cards total, shown 3 per row on desktop.
@@ -97,6 +101,20 @@ If deployment still does not work, check:
   - `cool-links.html` also includes a small inline `<style>` block for card-specific styling/cache reliability.
 
 ## 4. Quick edit examples
+
+- Add a new blog post:
+  1. Create a markdown file in `blogs/` (example: `blogs/2026-03-10-new-post.md`).
+  2. Add your markdown content (headings, paragraphs, lists, images, links, code blocks).
+  3. Add an entry to `blogs/index.json`:
+
+```json
+{
+  "file": "2026-03-10-new-post.md",
+  "title": "My New Post",
+  "date": "2026-03-10",
+  "summary": "One sentence summary shown on the blog page."
+}
+```
 
 - Add a new cool link card:
   1. Copy one existing linked card block in `cool-links.html`.

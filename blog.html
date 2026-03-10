@@ -26,27 +26,254 @@
   <main class="section">
     <div class="container">
       <h1>Blog</h1>
-      <p class="lead">Use this page for your writing. Replace example posts below with your own notes and ideas.</p>
-
-      <section class="blog-grid" aria-label="Posts">
+      <p class="lead">Posts are loaded from Markdown files in the <code>blogs/</code> folder.</p>
+      <p class="muted">Add a new <code>.md</code> file, then register it in <code>blogs/index.json</code>.</p>
+      <section id="blog-posts" class="blog-grid" aria-label="Posts">
         <article class="blog-post">
-          <time datetime="2026-02-24">February 24, 2026</time>
-          <h2>Welcome Post</h2>
-          <p>
-            This is the first post on my personal site. I will use this space to share thoughts on data engineering,
-            machine learning systems, and what I am building.
-          </p>
-        </article>
-
-        <article class="blog-post">
-          <time datetime="2026-02-24">February 24, 2026</time>
-          <h2>Post Template</h2>
-          <p>
-            Copy this card, update the date and title, and write your content. Keeping entries short and frequent works well.
-          </p>
+          <p class="muted">Loading posts...</p>
         </article>
       </section>
     </div>
   </main>
+
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <p>&copy; <span id="year"></span> Baxter Sapp</p>
+      <p><a href="mailto:baxtersapp@gmail.com">baxtersapp@gmail.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const postsRoot = document.getElementById('blog-posts');
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function safeUrl(url) {
+      if (!url) return '#';
+      const trimmed = url.trim();
+      const lower = trimmed.toLowerCase();
+      if (lower.startsWith('javascript:') || lower.startsWith('data:')) {
+        return '#';
+      }
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../') || trimmed.startsWith('#')) {
+        return trimmed;
+      }
+      if (!trimmed.includes(':')) {
+        return trimmed;
+      }
+      if (trimmed.startsWith('mailto:') || trimmed.startsWith('tel:')) {
+        return trimmed;
+      }
+      return '#';
+    }
+
+    function imageUrlFromMarkdown(url) {
+      const safe = safeUrl(url);
+      if (safe === '#') {
+        return safe;
+      }
+      if (safe.startsWith('http://') || safe.startsWith('https://') || safe.startsWith('/')) {
+        return safe;
+      }
+      if (safe.startsWith('./') || safe.startsWith('../')) {
+        return safe;
+      }
+      if (safe.startsWith('#')) {
+        return safe;
+      }
+      // Treat bare relative paths as site-root relative assets.
+      return './' + safe;
+    }
+
+    function parseInlineMarkdown(line) {
+      const escaped = escapeHtml(line);
+      return escaped
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
+          const href = safeUrl(url.trim());
+          return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + text + '</a>';
+        });
+    }
+
+    function markdownToHtml(markdown) {
+      const lines = markdown.replace(/\r\n/g, '\n').split('\n');
+      const htmlParts = [];
+      let paragraph = [];
+      let inList = false;
+      let inCode = false;
+      let codeFence = [];
+
+      function flushParagraph() {
+        if (paragraph.length) {
+          htmlParts.push('<p>' + parseInlineMarkdown(paragraph.join(' ')) + '</p>');
+          paragraph = [];
+        }
+      }
+
+      function closeList() {
+        if (inList) {
+          htmlParts.push('</ul>');
+          inList = false;
+        }
+      }
+
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+
+        if (line.startsWith('```')) {
+          flushParagraph();
+          closeList();
+          if (!inCode) {
+            inCode = true;
+            codeFence = [];
+          } else {
+            htmlParts.push('<pre><code>' + escapeHtml(codeFence.join('\n')) + '</code></pre>');
+            inCode = false;
+            codeFence = [];
+          }
+          continue;
+        }
+
+        if (inCode) {
+          codeFence.push(rawLine);
+          continue;
+        }
+
+        if (!line) {
+          flushParagraph();
+          closeList();
+          continue;
+        }
+
+        const imageMatch = line.match(/^!\[(.*?)\]\((.+?)\)$/);
+        if (imageMatch) {
+          flushParagraph();
+          closeList();
+          const alt = escapeHtml(imageMatch[1]);
+          const src = imageUrlFromMarkdown(imageMatch[2].trim());
+          htmlParts.push('<figure class="blog-media"><img src="' + src + '" alt="' + alt + '" loading="lazy"></figure>');
+          continue;
+        }
+
+        if (line.startsWith('### ')) {
+          flushParagraph();
+          closeList();
+          htmlParts.push('<h3>' + parseInlineMarkdown(line.slice(4)) + '</h3>');
+          continue;
+        }
+
+        if (line.startsWith('## ')) {
+          flushParagraph();
+          closeList();
+          htmlParts.push('<h2>' + parseInlineMarkdown(line.slice(3)) + '</h2>');
+          continue;
+        }
+
+        if (line.startsWith('# ')) {
+          flushParagraph();
+          closeList();
+          htmlParts.push('<h1>' + parseInlineMarkdown(line.slice(2)) + '</h1>');
+          continue;
+        }
+
+        if (line.startsWith('> ')) {
+          flushParagraph();
+          closeList();
+          htmlParts.push('<blockquote>' + parseInlineMarkdown(line.slice(2)) + '</blockquote>');
+          continue;
+        }
+
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+          flushParagraph();
+          if (!inList) {
+            htmlParts.push('<ul>');
+            inList = true;
+          }
+          htmlParts.push('<li>' + parseInlineMarkdown(line.slice(2)) + '</li>');
+          continue;
+        }
+
+        paragraph.push(line);
+      }
+
+      flushParagraph();
+      closeList();
+
+      if (inCode) {
+        htmlParts.push('<pre><code>' + escapeHtml(codeFence.join('\n')) + '</code></pre>');
+      }
+
+      return htmlParts.join('');
+    }
+
+    function formatDate(isoDate) {
+      const date = new Date(isoDate + 'T12:00:00');
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function renderError(message) {
+      postsRoot.innerHTML = '<article class="blog-post"><p class="muted">' + message + '</p></article>';
+    }
+
+    async function loadBlogPosts() {
+      try {
+        const manifestRes = await fetch('blogs/index.json');
+        if (!manifestRes.ok) {
+          throw new Error('Failed to load blogs/index.json');
+        }
+
+        const manifest = await manifestRes.json();
+        if (!manifest.posts || !Array.isArray(manifest.posts) || !manifest.posts.length) {
+          renderError('No posts found yet. Add entries to blogs/index.json.');
+          return;
+        }
+
+        const posts = [...manifest.posts].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const renderedPosts = await Promise.all(posts.map(async (post) => {
+          const mdRes = await fetch('blogs/' + post.file);
+          if (!mdRes.ok) {
+            throw new Error('Could not load: ' + post.file);
+          }
+
+          const markdown = await mdRes.text();
+          const bodyHtml = markdownToHtml(markdown);
+          const title = escapeHtml(post.title || 'Untitled Post');
+          const summary = escapeHtml(post.summary || '');
+          const isoDate = escapeHtml(post.date || '');
+          const prettyDate = formatDate(post.date || '2000-01-01');
+
+          return (
+            '<article class="blog-post rendered-post">' +
+              '<time datetime="' + isoDate + '">' + prettyDate + '</time>' +
+              '<h2>' + title + '</h2>' +
+              (summary ? '<p class="blog-summary">' + summary + '</p>' : '') +
+              '<div class="blog-markdown">' + bodyHtml + '</div>' +
+            '</article>'
+          );
+        }));
+
+        postsRoot.innerHTML = renderedPosts.join('');
+      } catch (error) {
+        renderError('Blog posts could not be loaded. Check blogs/index.json and your Markdown files.');
+      }
+    }
+
+    loadBlogPosts();
+  </script>
 </body>
 </html>
